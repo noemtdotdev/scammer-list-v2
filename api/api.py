@@ -19,7 +19,7 @@ class App(Quart):
 
 methods = ['GET', 'POST']
 
-def _api() -> App:
+def api() -> App:
 
     app = App(__name__)
     app = cors(app)
