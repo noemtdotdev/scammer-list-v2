@@ -1,21 +1,22 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 load_dotenv()
 
 class Bot(commands.AutoShardedBot):
-    def __init__(self, mongodb_connection, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
 
         self.token = os.getenv('TOKEN')
-        self.db = mongodb_connection
 
         self.owner_ids = []
         self.staff = []
+        self.db = MongoClient(os.getenv('MONGODB_URI'))['scammer-list']
 
         self.load_modules()
 
@@ -28,8 +29,17 @@ class Bot(commands.AutoShardedBot):
 
 
     async def on_ready(self):
-        # do some stuff to get owners and staff
-        ...
+        staff_collection = self.db["staff"]
+        staff:list = staff_collection.find({})
+
+        for staff_member in staff:
+            if staff_member.get("owner"):
+                self.owner_ids.append(staff_member['id'])
+                print(f"Owner loaded: {staff_member['username']}")
+            
+            else:
+                self.staff.append(staff_member["id"])
+                print(f"Staff loaded: {staff_member['username']}")
 
     async def on_interaction(self, interaction: discord.Interaction):
         await interaction.response.defer()
@@ -38,6 +48,6 @@ class Bot(commands.AutoShardedBot):
     async def start(self):
         await super().start(self.token)
 
-def _bot(mongodb_connection):
-    bot = Bot(mongodb_connection)
+def _bot():
+    bot = Bot()
     return bot

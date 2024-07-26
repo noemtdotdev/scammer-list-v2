@@ -3,24 +3,25 @@ from quart_cors import cors
 import os
 
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 load_dotenv()
 
 class App(Quart):
-    def __init__(self, mongodb_connection, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.api_key = os.getenv('API_KEY')
         self.api_url = os.getenv('API_URL')
-        self.db = mongodb_connection
+        self.db = MongoClient(os.getenv('MONGODB_URI'))['scammer-list']
 
         self.config['API_KEY'] = self.api_key
 
 methods = ['GET', 'POST']
 
-def _api(mongodb_connection) -> App:
+def _api() -> App:
 
-    app = App(mongodb_connection, __name__)
+    app = App(__name__)
     app = cors(app)
 
     for method in methods:
