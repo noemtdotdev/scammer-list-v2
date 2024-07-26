@@ -1,5 +1,5 @@
 import discord
-from discord.ui import View, Button, Select
+from discord.ui import View, Button, Select, Modal
 
 class ScammerLookupView(View):
     def __init__(self, scammer_data: list[dict], *args, **kwargs) -> None:
@@ -33,9 +33,7 @@ class ScammerLookupView(View):
 
     def generate_data_embed(self, data: dict) -> discord.Embed:
 
-        previous_aliases = None
-        if data.get('previous_aliases'):
-            previous_aliases = "\n".join(f"{i+1}: `{alias}`" for i, alias in enumerate(data.get('previous_aliases')))
+        previous_aliases = "\n".join(f"{i+1}: `{alias}`" for i, alias in enumerate(data.get('previous_aliases')))
 
         description = (
             f"Username: `{data['username']}` {'Perhaps termed?' if 'deleted_user' in data['username'] else ''}\n"
@@ -60,7 +58,7 @@ class ScammerLookupView(View):
 
     def generate_content(self) -> str:
         return "\n".join(
-            f"{i+1}. {scammer['username']} ({len(scammer.get('previous_aliases') if scammer.get('previous_aliases') else '0')}) `{scammer['id']}`"
+            f"{i+1}. {scammer['username']} ({len(scammer.get('previous_aliases'))}) `{scammer['id']}`"
             for i in range(self.page * 10, min((self.page + 1) * 10, len(self.scammer_data)))
             if (scammer := self.scammer_data[i])
         )
@@ -84,7 +82,7 @@ class ScammerLookupView(View):
         await interaction.response.send_message(embed=self.generate_data_embed(scammer_data), ephemeral=True)
 
     async def update_message(self, interaction: discord.Interaction) -> None:
-        self.children[2].options = self.generate_select_menu_options()  # Update select menu options
+        self.children[2].options = self.generate_select_menu_options()
         await interaction.response.edit_message(embed=self.generate_embed(), view=self)
 
     async def on_timeout(self) -> None:

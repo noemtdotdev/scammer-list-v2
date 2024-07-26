@@ -5,14 +5,6 @@ from bot.bot import Bot
 from bot.util.embed import embed_generator
 from bot.views.scammerlookup import ScammerLookupView 
 
-def data_to_string(*data):
-    string = ""
-    for item in data:
-        if type(item) in [dict, list]:
-            string += data_to_string(item)
-
-        string += f"{item}\u200b"
-
 class LookupModule(commands.Cog):
     def __init__(self, bot):
         self.bot:Bot = bot
@@ -26,7 +18,7 @@ class LookupModule(commands.Cog):
                     return True
         return False
 
-    scammers = SlashCommandGroup("scammers", "Scammer related commands.")
+    scammers = SlashCommandGroup("scammers", "Scammer related commands.", integration_types={discord.IntegrationType.user_install, discord.IntegrationType.guild_install})
 
     @scammers.command(
         name="lookup",
@@ -49,15 +41,33 @@ class LookupModule(commands.Cog):
                 data.append(scammer)
 
         if not data:
-            return await ctx.respond(embed=embed_generator(title="Scammer Lookup", description=f"No scammers found for given query: `{query}`"))
+            return await ctx.respond(embed=embed_generator(title="Scammer Lookup", description=f"No scammers found for given query: `{query}`."))
 
         view = ScammerLookupView(scammer_data=data)
         embed = view.generate_embed()
 
         await ctx.respond(embed=embed, view=view)
 
-        
+    @scammers.command(
+        name="get-all",
+        description="Get all scammers in the database.",
+    )
+    async def lookup(self, ctx: discord.ApplicationContext):
+        collection = self.bot.db["scammers"]
 
+        data = []
+        scammers_data = collection.find({})
+
+        for scammer in scammers_data:
+            data.append(scammer)
+
+        if not data:
+            return await ctx.respond(embed=embed_generator(title="Scammer Lookup", description=f"No scammers found in the database."))
+
+        view = ScammerLookupView(scammer_data=data)
+        embed = view.generate_embed()
+
+        await ctx.respond(embed=embed, view=view)
 
 def setup(bot:Bot):
     bot.add_cog(LookupModule(bot))

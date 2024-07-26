@@ -65,6 +65,9 @@ class Bot(commands.AutoShardedBot):
             if "deleted_user" in current_username:
                 continue
 
+            if "deleted_user" in name_history:
+                continue
+
             scammer_object = self.get_user(user_id)
             if not scammer_object:
 
@@ -72,7 +75,7 @@ class Bot(commands.AutoShardedBot):
                     scammer_object = await self.fetch_user(user_id)
 
                 except discord.errors.NotFound:
-                    scammer["username"] = "deleted_user"
+                    scammer["username"] = name_history[-1] if len(name_history) > 0 else "deleted_user"
                     name_history.append("deleted_user")
 
                     scammer["previous_aliases"] = name_history
@@ -105,6 +108,7 @@ class Bot(commands.AutoShardedBot):
 
         self.load_staff.start()
         # self.update_scammers.start()
+        print(f'Bot is ready. Owner IDs: {self.owner_ids}')
 
     async def on_interaction(self, interaction: discord.Interaction):
         if interaction.type == discord.InteractionType.application_command:

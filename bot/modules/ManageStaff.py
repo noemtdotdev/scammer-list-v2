@@ -8,7 +8,7 @@ class ManageStaff(commands.Cog):
     def __init__(self, bot):
         self.bot:Bot = bot
 
-    staff = SlashCommandGroup("staff", "Staff management commands")
+    staff = SlashCommandGroup("staff", "Staff management commands", integration_types={discord.IntegrationType.user_install, discord.IntegrationType.guild_install})
 
     @staff.command(
         name="add",
@@ -35,7 +35,9 @@ class ManageStaff(commands.Cog):
             'nick': user.global_name,
         })
 
-        await ctx.respond(embed=embed_generator(title="Success", description=f"{user.display_name} has been added to the staff list.", color=discord.Color.green()))
+        self.bot.staff.append(user.id)
+
+        await ctx.respond(embed=embed_generator(title="Success", description=f"{user.mention} has been added to the staff list.", color=discord.Color.green()))
 
     
     @staff.command(
@@ -57,8 +59,10 @@ class ManageStaff(commands.Cog):
             return await ctx.respond(embed=embed_generator(title="Error", description="This person is not a staff member."))
         
         staff_collection.delete_one({'id': user.id})
+
+        self.bot.staff.remove(user.id)
         
-        await ctx.respond(embed=embed_generator(title="Success", description=f"{user.display_name} has been removed from the staff list.", color=discord.Color.green()))
+        await ctx.respond(embed=embed_generator(title="Success", description=f"{user.mention} has been removed from the staff list.", color=discord.Color.green()))
 
 def setup(bot:Bot):
     bot.add_cog(ManageStaff(bot))
