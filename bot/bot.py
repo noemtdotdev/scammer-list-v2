@@ -45,6 +45,14 @@ class Bot(commands.AutoShardedBot):
             else:
                 self.staff.append(staff_member["id"])
 
+    @tasks.loop(seconds=10)
+    async def update_activity(self):
+        scammers_collection = self.db["scammers"]
+        scammers_count = scammers_collection.count_documents({})
+
+        activity = discord.CustomActivity(f"{scammers_count} scammers | by @nom")
+        await self.change_presence(activity=activity)
+
 
     @tasks.loop(hours=24)
     async def update_scammers(self):
@@ -108,6 +116,7 @@ class Bot(commands.AutoShardedBot):
 
         self.load_staff.start()
         # self.update_scammers.start()
+        self.update_activity.start()
         print(f'Bot is ready. Owner IDs: {self.owner_ids}')
 
     async def on_interaction(self, interaction: discord.Interaction):
