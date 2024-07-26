@@ -1,0 +1,5 @@
+py-cord
+quart
+quart_cors
+python_dotenv
+pymongo
