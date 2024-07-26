@@ -14,6 +14,8 @@ class App(Quart):
         self.api_url = os.getenv('API_URL')
         self.db = mongodb_connection
 
+        self.config['API_KEY'] = self.api_key
+
 methods = ['GET', 'POST']
 
 def _api(mongodb_connection) -> App:
