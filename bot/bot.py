@@ -23,7 +23,7 @@ class Bot(commands.AutoShardedBot):
         self.session = None
 
         self.file_handler = AttachmentToLocalFileHostHandler(
-            base_path="/api/files",
+            base_path="files",
             url_base="https://pixly.noemt.dev/assets/",
         )
 
@@ -132,8 +132,6 @@ class Bot(commands.AutoShardedBot):
         self.add_view(ReportView(self))
         self.add_view(TicketView(self))
 
-
-
     async def on_interaction(self, interaction: discord.Interaction):
         if interaction.type == discord.InteractionType.application_command:
             await interaction.response.defer()
@@ -148,5 +146,7 @@ class Bot(commands.AutoShardedBot):
         ticket_collection.update_one({"channel_id": channel.id}, {"$set": {"closed": True}})
 
 def bot():
-    bot = Bot()
+    intents = discord.Intents.default()
+    intents.message_content = True
+    bot = Bot(intents=intents)
     return bot

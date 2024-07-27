@@ -26,7 +26,13 @@ class PanelCreate(commands.Cog):
         view = ReportView(self.bot)
         embed = discord.Embed(
             title="Report Scammer",
-            description="If you want to report a scammer, press the button below.",
+            description=(
+                "If you want to report a scammer, press the button below.\n\n"
+                "## How to have the best chances to get someone marked?\n"
+                "- gather evidence (video preferred) of you, or someone else getting scammed\n"
+                "- explain in detail what happened\n"
+                "**we will ask you if we find anything unclear**."
+            ),
             color=discord.Color.red(),
         )
         await channel.send(embed=embed, view=view)

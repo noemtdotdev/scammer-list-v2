@@ -50,10 +50,10 @@ class HelpCommand(commands.Cog):
     async def info(self, ctx:discord.ApplicationContext):
 
         view = discord.ui.View()
-        support_button = discord.ui.Button(row=1, label="Support Server", url="https://discord.gg/949Ekcpf")
-        website_button = discord.ui.Button(row=1, label="Source Code", url="https://github.com/noemtdotdev/scammer-list-v2")
+        support_button = discord.ui.Button(row=0, label="Support Server", url="https://discord.gg/949Ekcpf")
+        website_button = discord.ui.Button(row=0, label="Source Code", url="https://github.com/noemtdotdev/scammer-list-v2")
         privacy_policy = discord.ui.Button(row=1, label="Privacy Policy", url="https://noemt.dev/privacy")
-        
+
         view.add_item(support_button)
         view.add_item(website_button)
         view.add_item(privacy_policy)
