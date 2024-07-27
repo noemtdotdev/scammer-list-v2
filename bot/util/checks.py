@@ -10,19 +10,28 @@ client = MongoClient(os.getenv('MONGODB_URI'))
 
 db = client['scammer-list']
 
-def lookup_scammer(id: str) -> bool:
-    return db['scammers'].find_one({'id': id}) is not None
-
 class NotScammer(CheckFailure):
+    pass
+
+class NotStaff(CheckFailure):
     pass
 
 def is_scammer():
 
     async def predicate(ctx: Context) -> bool:
 
-        if not lookup_scammer(ctx.author().id):
+        if db['scammers'].find_one({'id': str(ctx.author.id)}) is None:
             raise NotScammer("You are not a scammer.")
         
         return True
 
+    return check(predicate)
+
+def is_staff():
+    async def predicate(ctx: Context) -> bool:
+        if db['staff'].find_one({'id': int(ctx.author.id)}) is None:
+            raise NotStaff("You are not a staff member.")
+        
+        return True
+    
     return check(predicate)

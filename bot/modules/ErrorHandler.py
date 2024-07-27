@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from bot.util.checks import NotScammer
+from bot.util.checks import NotScammer, NotStaff
 import traceback
 
 class ErrorHandler(commands.Cog):
@@ -51,6 +51,14 @@ class ErrorHandler(commands.Cog):
             elif isinstance(error, NotScammer):
                 embed = discord.Embed(color=discord.Color.brand_red(
                 ), title="An Error Occured.", description=f"You are not a scammer. You can't use this command.")
+                embed.set_footer(
+                    text="Made by notnomv6", icon_url="https://bots.noemt.dev/avatars/nom.png")
+                await ctx.respond(embed=embed, ephemeral=True)
+                return
+            
+            elif isinstance(error, NotStaff):
+                embed = discord.Embed(color=discord.Color.brand_red(
+                ), title="An Error Occured.", description=f"You need to be a staff member to execute this command.")
                 embed.set_footer(
                     text="Made by notnomv6", icon_url="https://bots.noemt.dev/avatars/nom.png")
                 await ctx.respond(embed=embed, ephemeral=True)
