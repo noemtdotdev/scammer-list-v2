@@ -165,6 +165,9 @@ class ScammersModule(commands.Cog):
 
         if not user.isdigit():
             return await ctx.respond(embed=embed_generator(title="Invalid User ID", description="Please provide a valid user"))    
+        
+        if int(user) == ctx.author.id:
+            return await ctx.respond(embed=embed_generator(title="Error", description="You cannot remove yourself."))
 
         scammer = scammers_collection.find_one({'id': user})
         if not scammer:
@@ -224,6 +227,9 @@ class ScammersModule(commands.Cog):
         
         if not user.isdigit():
             return await ctx.respond(embed=embed_generator(title="Invalid User ID", description="Please provide a valid user"))
+                
+        if int(user) == ctx.author.id:
+            return await ctx.respond(embed=embed_generator(title="Error", description="You cannot update yourself."))
         
         scammers_collection = self.bot.db["scammers"]
         scammer = scammers_collection.find_one({'id': user})

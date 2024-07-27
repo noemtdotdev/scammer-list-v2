@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 import aiohttp
 
+from chat_exporter import AttachmentToLocalFileHostHandler
+
 load_dotenv()
 
 class Bot(commands.AutoShardedBot):
@@ -19,6 +21,11 @@ class Bot(commands.AutoShardedBot):
         self.staff = []
         self.db = MongoClient(os.getenv('MONGODB_URI'))['scammer-list']
         self.session = None
+
+        self.file_handler = AttachmentToLocalFileHostHandler(
+            base_path="/api/files",
+            url_base="https://pixly.noemt.dev/assets/",
+        )
 
         self.load_modules()
 
@@ -119,6 +126,14 @@ class Bot(commands.AutoShardedBot):
         self.update_activity.start()
         print(f'Bot is ready. Owner IDs: {self.owner_ids}')
 
+        from bot.views.report import ReportView
+        from bot.views.ticket import TicketView
+
+        self.add_view(ReportView(self))
+        self.add_view(TicketView(self))
+
+
+
     async def on_interaction(self, interaction: discord.Interaction):
         if interaction.type == discord.InteractionType.application_command:
             await interaction.response.defer()
@@ -127,6 +142,10 @@ class Bot(commands.AutoShardedBot):
 
     async def start(self):
         await super().start(self.token)
+
+    async def on_guild_channel_delete(self, channel):
+        ticket_collection = self.db["tickets"]
+        ticket_collection.update_one({"channel_id": channel.id}, {"$set": {"closed": True}})
 
 def bot():
     bot = Bot()

@@ -89,5 +89,10 @@ class ScammerLookupView(View):
         for child in self.children:
             if isinstance(child, (Button, Select)):
                 child.disabled = True
-        await self.message.edit(view=self)
+                
+        try:
+            await self.message.edit(view=self)
+        except discord.errors.NotFound:
+            pass
+
         await super().on_timeout()
