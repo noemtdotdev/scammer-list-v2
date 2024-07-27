@@ -13,10 +13,10 @@ class ReportModal(Modal):
             discord.ui.InputText(label="User ID", placeholder="User ID of the scammer", max_length=20, min_length=18),
         )
         self.add_item(
-            discord.ui.InputText(label="Reason", placeholder="How did the person scam?", style=discord.InputTextStyle.long, max_length=1000),
+            discord.ui.InputText(label="Reason", placeholder="How did the person scam?", style=discord.InputTextStyle.long, max_length=100),
         )
         self.add_item(
-            discord.ui.InputText(label="Amount", placeholder="How much were you scammed for?"),
+            discord.ui.InputText(label="Amount", placeholder="How much were you scammed for?", max_length=20),
         )
 
     def get_overwrites(self, interaction: discord.Interaction) -> dict:
@@ -49,7 +49,7 @@ class ReportModal(Modal):
             await interaction.respond("Cannot open a new ticket as the category limit was reached. Please DM a staff member.", ephemeral=True)
             return
         
-        channel = await category.create_text_channel(name=f"report-{interaction.user.name}")
+        channel = await category.create_text_channel(name=f"report-{interaction.user.name}", overwrites=self.get_overwrites(interaction))
         data = {
             "user_id": interaction.user.id,
             "channel_id": channel.id,

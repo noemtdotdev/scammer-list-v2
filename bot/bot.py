@@ -122,7 +122,7 @@ class Bot(commands.AutoShardedBot):
             self.owner_ids.append(current_account)
 
         self.load_staff.start()
-        # self.update_scammers.start()
+        self.update_scammers.start()
         self.update_activity.start()
         print(f'Bot is ready. Owner IDs: {self.owner_ids}')
 
@@ -134,6 +134,9 @@ class Bot(commands.AutoShardedBot):
 
     async def on_interaction(self, interaction: discord.Interaction):
         if interaction.type == discord.InteractionType.application_command:
+            await interaction.response.defer()
+
+        elif interaction.type == discord.InteractionType.modal_submit:
             await interaction.response.defer()
 
         return await super().on_interaction(interaction)
